@@ -1,0 +1,30 @@
+name: Sync from source
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out GitHub repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch source branch
+        run: git fetch https://gitlink.org.cn/xxooo/in.git master:refs/remotes/source/master
+
+      - name: Merge source changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git merge --no-edit source/master
+
+      - name: Push merged changes
+        run: git push origin master
